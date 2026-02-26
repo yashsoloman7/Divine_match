@@ -1,0 +1,64 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Page Views
+import Home from './pages/Home';
+import Register from './pages/Register';
+import Biodata from './pages/Biodata';
+import Events from './pages/Events';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+
+// Admin Views
+import AdminLayout from './components/AdminLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminEvents from './pages/AdminEvents';
+import AdminHosts from './pages/AdminHosts';
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public & App Routes with Standard Layout */}
+          <Route element={
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <Navbar />
+              <main className="main-content">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+          }>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/register" element={<ProtectedRoute><Register /></ProtectedRoute>} />
+            <Route path="/biodata" element={<ProtectedRoute><Biodata /></ProtectedRoute>} />
+            <Route path="*" element={<Home />} />
+          </Route>
+
+          {/*  Routes with Separate  Layout */}
+          <Route path="/admin" element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="events" element={<AdminEvents />} />
+            <Route path="hosts" element={<AdminHosts />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
