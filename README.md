@@ -1,16 +1,88 @@
-# React + Vite
+# Divine Match
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Divine Match is a comprehensive form-based web application tailored for Christian matrimony. It is designed to facilitate meaningful connections, allowing divorced, single men and women to register as candidates, generate digital biodata cards, and participate in organized events like the annual "Yuvak Yuvti Sammelan."
 
-Currently, two official plugins are available:
+## 🌟 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Candidate Registration**: Secure registration process with validated contact information (mandatory phone number).
+- **Digital Biodata Generation**: Automatically generates elegant digital biodata cards for registered candidates.
+- **Event Management**: Built-in support for organizing and managing physical meetups and annual events.
+- **Admin Dashboard**: Robust admin panel for managing candidate data, viewing full biodata, and seamless CSV import of pre-added candidates.
+- **Secure Authentication**: Email and password-based authentication with protected routes.
+- **Responsive Design**: Designed to work flawlessly across desktop, tablet, and mobile devices.
 
-## React Compiler
+## 🛠️ Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 19, Vite, React Router DOM v7
+- **Styling**: Vanilla CSS (`index.css`)
+- **Backend**: Supabase (Authentication & Database)
+- **Icons**: Lucide React
+- **Data Parsing**: PapaParse (for CSV imports)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- npm or yarn
+- Supabase account and project
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd divine_match
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   Create a `.env` file in the root directory and add your Supabase credentials (refer to `.env.example`):
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser** and navigate to `http://localhost:5173`.
+
+## 📁 Project Structure
+
+```text
+src/
+├── assets/        # Static assets (images, fonts, etc.)
+├── components/    # Reusable React components (Navbar, Footer, AdminLayout, etc.)
+├── config/        # Configuration files
+├── context/       # React Context providers (AuthContext)
+├── data/          # Mock data or static data assets
+├── pages/         # Page components (Home, Register, Biodata, Admin views)
+├── services/      # API and backend service integrations (Supabase operations)
+├── styles/        # Additional stylesheets
+├── App.jsx        # Main application routing
+└── main.jsx       # Application entry point
+```
+
+## 📜 Available Scripts
+
+In the project directory, you can run:
+
+- `npm run dev` - Starts the Vite development server.
+- `npm run build` - Builds the app for production to the `dist` folder.
+- `npm run lint` - Runs ESLint to catch syntax and style issues.
+- `npm run preview` - Locally preview the production build.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## 📄 License
+
+This project is private and all rights are reserved.
