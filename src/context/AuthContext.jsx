@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signupWithEmail = async (name, email, password) => {
+    const signupWithEmail = async (name, email, password, role = 'candidate') => {
         // Mocking Signup
         return new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -103,7 +103,8 @@ export const AuthProvider = ({ children }) => {
                         email,
                         name,
                         avatar: `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=9b6a38&color=fff`,
-                        provider: 'email'
+                        provider: 'email',
+                        role
                     };
                     setUser(mockUser);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));

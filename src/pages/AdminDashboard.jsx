@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getCandidates } from '../services/candidateService';
 import { Users, LayoutDashboard, Sparkles, Filter } from 'lucide-react';
 
@@ -67,6 +68,9 @@ const AdminDashboard = () => {
                         <LayoutDashboard size={28} /> Admin Console
                     </h2>
                     <p className="text-lead" style={{ margin: 0 }}>System-wide operations and match analysis restricted to authorized admins.</p>
+                    <Link to="/admin/add-candidate" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', padding: '0.5rem 1rem' }}>
+                        <Users size={16} /> Add New Candidate
+                    </Link>
                 </div>
                 <div style={{ textAlign: 'center', background: 'var(--surface)', padding: '1rem 2rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary)' }}>{candidates.length}</div>

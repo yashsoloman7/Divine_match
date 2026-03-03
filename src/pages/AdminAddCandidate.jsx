@@ -4,7 +4,7 @@ import { INTEREST_OPTIONS } from '../data/mockData';
 import { addCandidate } from '../services/candidateService';
 import { Check, UploadCloud } from 'lucide-react';
 
-const Register = () => {
+const AdminAddCandidate = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
@@ -138,8 +138,8 @@ const Register = () => {
         };
 
         try {
-            const newCandidate = await addCandidate(submissionData);
-            navigate('/biodata', { state: { profile: newCandidate } });
+            await addCandidate(submissionData);
+            navigate('/admin');
         } catch (error) {
             console.error("Failed to register candidate:", error);
             alert("Error saving candidate! Ensure Supabase is connected.");
@@ -162,9 +162,9 @@ const Register = () => {
     return (
         <div className="container" style={{ maxWidth: '1000px', padding: '2rem 1rem' }}>
             <div className="glass-card animate-fade-in" style={{ padding: '3rem' }}>
-                <h2 className="heading-2" style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>Candidate Registration Form</h2>
+                <h2 className="heading-2" style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>Add Candidate Profile (Admin)</h2>
                 <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-                    Please fill out all the details accurately to generate your Matrimony Biodata.
+                    Quickly add new candidate profiles directly to the system.
                 </p>
 
                 <form onSubmit={handleSubmit}>
@@ -474,4 +474,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default AdminAddCandidate;

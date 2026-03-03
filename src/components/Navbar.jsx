@@ -24,8 +24,15 @@ const Navbar = () => {
 
                 {user ? (
                     <>
-                        <Link to="/register" className={`nav-link ${isActive('/register')}`}>My Profile</Link>
-                        <Link to="/admin" className={`nav-link ${isActive('/admin')}`}>Admin</Link>
+                        {(!user.role || user.role === 'candidate') && (
+                            <Link to="/register" className={`nav-link ${isActive('/register')}`}>My Profile</Link>
+                        )}
+                        {user.role === 'guardian' && (
+                            <Link to="/register" className={`nav-link ${isActive('/register')}`}>Add Candidate Profile</Link>
+                        )}
+                        {(user.role === 'admin' || user.role === 'host') && (
+                            <Link to="/admin" className={`nav-link ${isActive('/admin')}`}>Admin</Link>
+                        )}
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '1rem', paddingLeft: '2rem', borderLeft: '1px solid rgba(155, 106, 56, 0.2)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

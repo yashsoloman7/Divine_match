@@ -9,6 +9,7 @@ const SignUp = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState('candidate');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +30,7 @@ const SignUp = () => {
         setError('');
         setIsLoading(true);
         try {
-            await signupWithEmail(name, email, password);
+            await signupWithEmail(name, email, password, role);
             navigate('/');
         } catch (err) {
             setError(err.message || 'Sign up failed');
@@ -91,6 +92,18 @@ const SignUp = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label className="form-label">I am registering as</label>
+                        <select 
+                            className="form-control"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            required
+                        >
+                            <option value="candidate">Candidate (For Myself)</option>
+                            <option value="guardian">Guardian / Host (For Relative)</option>
+                        </select>
+                    </div>
                     <div className="form-group">
                         <label className="form-label">Full Name</label>
                         <input

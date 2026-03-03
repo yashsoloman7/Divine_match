@@ -19,6 +19,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminEvents from './pages/AdminEvents';
 import AdminHosts from './pages/AdminHosts';
+import AdminAddCandidate from './pages/AdminAddCandidate';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="hosts" element={<AdminHosts />} />
+            <Route path="add-candidate" element={<AdminAddCandidate />} />
           </Route>
         </Routes>
       </BrowserRouter>
