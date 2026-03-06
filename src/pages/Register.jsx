@@ -142,7 +142,7 @@ const Register = () => {
             navigate('/biodata', { state: { profile: newCandidate } });
         } catch (error) {
             console.error("Failed to register candidate:", error);
-            alert("Error saving candidate! Ensure Supabase is connected.");
+            alert("Error saving candidate! Ensure the backend connection is successful.");
         }
     };
 

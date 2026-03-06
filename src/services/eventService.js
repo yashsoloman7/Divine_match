@@ -1,29 +1,12 @@
-import { supabase } from '../config/supabase';
+const API_URL = 'http://localhost:5000/api/events';
 
 export const getEvents = async () => {
     try {
-        const { data, error } = await supabase
-            .from('events')
-            .select('*')
-            .order('date_start', { ascending: true });
-
-        if (error) {
-            console.error('Error fetching events:', error);
-            return [];
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-
-        // Map snake_case to camelCase
-        return data.map(dbRow => ({
-            id: dbRow.id,
-            title: dbRow.title,
-            description: dbRow.description,
-            dateStart: dbRow.date_start,
-            dateEnd: dbRow.date_end,
-            location: dbRow.location,
-            priceCandidate: dbRow.price_candidate,
-            priceFamily: dbRow.price_family,
-            createdAt: dbRow.created_at
-        }));
+        return await response.json();
     } catch (error) {
         console.error('Unexpected error fetching events:', error);
         return [];
@@ -35,25 +18,26 @@ export const addEvent = async (event) => {
         const dbPayload = {
             title: event.title || '',
             description: event.description || '',
-            date_start: event.dateStart || new Date().toISOString().split('T')[0],
-            date_end: event.dateEnd || null,
+            dateStart: event.dateStart || new Date().toISOString().split('T')[0],
+            dateEnd: event.dateEnd || null,
             location: event.location || '',
-            price_candidate: event.priceCandidate ? parseFloat(event.priceCandidate) : 0,
-            price_family: event.priceFamily ? parseFloat(event.priceFamily) : 0
+            priceCandidate: event.priceCandidate ? parseFloat(event.priceCandidate) : 0,
+            priceFamily: event.priceFamily ? parseFloat(event.priceFamily) : 0
         };
 
-        const { data, error } = await supabase
-            .from('events')
-            .insert([dbPayload])
-            .select()
-            .single();
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dbPayload),
+        });
 
-        if (error) {
-            console.error('Error adding event:', error);
-            throw error;
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
 
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('Unexpected error adding event:', error);
         throw error;
@@ -62,13 +46,12 @@ export const addEvent = async (event) => {
 
 export const deleteEvent = async (id) => {
     try {
-        const { error } = await supabase
-            .from('events')
-            .delete()
-            .eq('id', id);
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE',
+        });
 
-        if (error) {
-            console.error(`Error deleting event with id ${id}:`, error);
+        if (!response.ok) {
+            console.error(`Error deleting event with id ${id}`);
             return false;
         }
 

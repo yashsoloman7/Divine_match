@@ -1,18 +1,12 @@
-import { supabase } from '../config/supabase';
+const API_URL = 'http://localhost:5000/api/admins';
 
 export const getAdmins = async () => {
     try {
-        const { data, error } = await supabase
-            .from('admins')
-            .select('*')
-            .order('created_at', { ascending: true });
-
-        if (error) {
-            console.error('Error fetching admins:', error);
-            return [];
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('Unexpected error fetching admins:', error);
         return [];
@@ -27,18 +21,19 @@ export const addAdmin = async (admin) => {
             role: admin.role || 'host'
         };
 
-        const { data, error } = await supabase
-            .from('admins')
-            .insert([dbPayload])
-            .select()
-            .single();
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dbPayload),
+        });
 
-        if (error) {
-            console.error('Error adding admin:', error);
-            throw error;
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
 
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('Unexpected error adding admin:', error);
         throw error;
@@ -47,13 +42,12 @@ export const addAdmin = async (admin) => {
 
 export const deleteAdmin = async (id) => {
     try {
-        const { error } = await supabase
-            .from('admins')
-            .delete()
-            .eq('id', id);
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE',
+        });
 
-        if (error) {
-            console.error(`Error deleting admin with id ${id}:`, error);
+        if (!response.ok) {
+            console.error(`Error deleting admin with id ${id}`);
             return false;
         }
 
@@ -67,17 +61,11 @@ export const deleteAdmin = async (id) => {
 // Function used during login to check if the user exists in the admin table
 export const checkAdminByEmail = async (email) => {
     try {
-        const { data, error } = await supabase
-            .from('admins')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-        if (error) {
+        const response = await fetch(`${API_URL}/email/${encodeURIComponent(email)}`);
+        if (!response.ok) {
             return null; // Not found or error
         }
-
-        return data;
+        return await response.json();
     } catch (error) {
         return null;
     }
