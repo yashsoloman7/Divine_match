@@ -8,14 +8,15 @@ Divine Match is a comprehensive form-based web application tailored for Christia
 - **Digital Biodata Generation**: Automatically generates elegant digital biodata cards for registered candidates.
 - **Event Management**: Built-in support for organizing and managing physical meetups and annual events.
 - **Admin Dashboard**: Robust admin panel for managing candidate data, viewing full biodata, and seamless CSV import of pre-added candidates.
-- **Secure Authentication**: Email and password-based authentication with protected routes.
+- **Secure Authentication**: Authentication with protected routes.
 - **Responsive Design**: Designed to work flawlessly across desktop, tablet, and mobile devices.
 
 ## 🛠️ Technology Stack
 
 - **Frontend**: React 19, Vite, React Router DOM v7
 - **Styling**: Vanilla CSS (`index.css`)
-- **Backend**: Supabase (Authentication & Database)
+- **Backend Framework**: Node.js & Express.js
+- **Database**: MongoDB Atlas
 - **Icons**: Lucide React
 - **Data Parsing**: PapaParse (for CSV imports)
 
@@ -25,9 +26,9 @@ Divine Match is a comprehensive form-based web application tailored for Christia
 
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
 - npm or yarn
-- Supabase account and project
+- MongoDB Atlas cluster connection string
 
-### Installation
+### Installation & Setup
 
 1. **Clone the repository:**
    ```bash
@@ -35,44 +36,64 @@ Divine Match is a comprehensive form-based web application tailored for Christia
    cd divine_match
    ```
 
-2. **Install dependencies:**
+2. **Frontend Setup:**
    ```bash
+   # Install dependencies
    npm install
-   ```
-
-3. **Set up environment variables:**
-   Create a `.env` file in the root directory and add your Supabase credentials (refer to `.env.example`):
-   ```env
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Start the development server:**
-   ```bash
+   
+   # Start the development server
    npm run dev
    ```
 
-5. **Open your browser** and navigate to `http://localhost:5173`.
+3. **Backend Setup:**
+   ```bash
+   # Navigate to the backend directory
+   cd server
+   
+   # Install backend dependencies
+   npm install
+   ```
+
+4. **Environment Variables:**
+   Create a `.env` file inside the `server/` directory and add your MongoDB connection string and designated port:
+   ```env
+   MONGO_URI="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority"
+   PORT=5000
+   ```
+   *Note: Ensure `.env` is inside the `server/` directory, not just the root folder.*
+
+5. **Start the Backend Server:**
+   ```bash
+   # From inside the server/ directory
+   node server.js
+   ```
+
+6. **Open your browser** and navigate to `http://localhost:5173`.
 
 ## 📁 Project Structure
 
 ```text
-src/
-├── assets/        # Static assets (images, fonts, etc.)
-├── components/    # Reusable React components (Navbar, Footer, AdminLayout, etc.)
-├── config/        # Configuration files
-├── context/       # React Context providers (AuthContext)
-├── data/          # Mock data or static data assets
-├── pages/         # Page components (Home, Register, Biodata, Admin views)
-├── services/      # API and backend service integrations (Supabase operations)
-├── styles/        # Additional stylesheets
-├── App.jsx        # Main application routing
-└── main.jsx       # Application entry point
+divine_match/
+├── src/                # Frontend codebase
+│   ├── assets/         # Static assets (images, fonts, etc.)
+│   ├── components/     # Reusable React components
+│   ├── context/        # React Context providers
+│   ├── data/           # Mock data or static data assets
+│   ├── pages/          # Page components
+│   ├── services/       # API services communicating with backend
+│   ├── App.jsx         # Main application routing
+│   └── main.jsx        # Application entry point
+├── server/             # Backend codebase
+│   ├── config/         # Database and server config
+│   ├── controllers/    # API endpoint logic
+│   ├── models/         # Mongoose schemas/models
+│   ├── routes/         # Express API routes
+│   └── server.js       # Main backend entry point
 ```
 
 ## 📜 Available Scripts
 
-In the project directory, you can run:
+In the project root directory, you can run:
 
 - `npm run dev` - Starts the Vite development server.
 - `npm run build` - Builds the app for production to the `dist` folder.
