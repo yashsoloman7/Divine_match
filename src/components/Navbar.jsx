@@ -11,6 +11,15 @@ const Navbar = () => {
         return location.pathname === path ? 'active' : '';
     };
 
+    const getInitials = (name) => {
+        if (!name) return 'U';
+        const parts = name.split(' ').filter(p => p.trim() !== '');
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+    };
+
     return (
         <nav className="navbar container">
             <Link to="/" className="logo">
@@ -24,11 +33,11 @@ const Navbar = () => {
 
                 {user ? (
                     <>
-                        {(!user.role || user.role === 'candidate') && (
-                            <Link to="/register" className={`nav-link ${isActive('/register')}`}>My Profile</Link>
+                        {(!user.role || user.role === 'candidate' || user.role === 'user') && (
+                            <Link to="/profile" className={`nav-link ${isActive('/profile')}`}>My Profile</Link>
                         )}
                         {user.role === 'guardian' && (
-                            <Link to="/register" className={`nav-link ${isActive('/register')}`}>Add Candidate Profile</Link>
+                            <Link to="/profile" className={`nav-link ${isActive('/profile')}`}>Host Profile</Link>
                         )}
                         {(user.role === 'admin' || user.role === 'host') && (
                             <Link to="/admin" className={`nav-link ${isActive('/admin')}`}>Admin</Link>
@@ -36,13 +45,9 @@ const Navbar = () => {
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: '1rem', paddingLeft: '2rem', borderLeft: '1px solid rgba(155, 106, 56, 0.2)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                {user.avatar ? (
-                                    <img src={user.avatar} alt="Profile" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                                ) : (
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                                        <UserIcon size={16} />
-                                    </div>
-                                )}
+                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} title={user.name}>
+                                    {getInitials(user.name)}
+                                </div>
                                 <span style={{ fontWeight: 500, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>{user.name}</span>
                             </div>
                             <button onClick={logout} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)' }}>

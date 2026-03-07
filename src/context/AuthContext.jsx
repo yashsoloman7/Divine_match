@@ -1,132 +1,112 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { checkAdminByEmail } from '../services/adminService';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 const STORAGE_KEY = 'divine_match_user';
+const TOKEN_KEY = 'divine_match_token';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Load user from local storage on mount
+    // Load user and token from local storage on mount
     useEffect(() => {
         const storedUser = localStorage.getItem(STORAGE_KEY);
-        if (storedUser) {
+        const storedToken = localStorage.getItem(TOKEN_KEY);
+
+        if (storedUser && storedToken) {
             try {
                 setUser(JSON.parse(storedUser));
+                setToken(storedToken);
+                // Optionally set axios default header here if making authenticated requests
+                axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
             } catch (e) {
                 console.error("Failed to parse user session", e);
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(TOKEN_KEY);
             }
         }
         setLoading(false);
     }, []);
 
-    const loginWithGoogle = async () => {
-        // Mocking Google OAuth flow
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockGoogleUser = {
-                    id: 'google-user-' + Date.now(),
-                    email: 'blessed.soul@gmail.com',
-                    name: 'Blessed Soul',
-                    avatar: 'https://ui-avatars.com/api/?name=Blessed+Soul&background=9b6a38&color=fff',
-                    provider: 'google',
-                    role: 'admin' // Grandfathered role for testing
-                };
-                setUser(mockGoogleUser);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(mockGoogleUser));
-                resolve(mockGoogleUser);
-            }, 800);
-        });
-    };
-
-    const loginWithEmail = async (email, password) => {
-        if (!email || !password) {
-            throw new Error('Invalid email or password');
-        }
-
+    const loginWithGoogle = async (credential) => {
         try {
-            // Check if this email exists in our Supabase admins table
-            const adminRecord = await checkAdminByEmail(email);
+            const response = await axios.post(`${API_URL}/auth/google`, {
+                credential
+            });
 
-            let authUser;
+            const { token, user } = response.data;
 
-            if (adminRecord) {
-                // This user is an admin or host
-                authUser = {
-                    id: adminRecord.id,
-                    email: adminRecord.email,
-                    name: adminRecord.name,
-                    avatar: `https://ui-avatars.com/api/?name=${adminRecord.name.replace(' ', '+')}&background=9b6a38&color=fff`,
-                    provider: 'email',
-                    role: adminRecord.role // 'admin' or 'host'
-                };
-            } else if (email === 'admin@divinematch.com') {
-                // Fallback in case the Supabase table isn't set up yet
-                authUser = {
-                    id: 'fallback-admin',
-                    email,
-                    name: 'Grand Admin',
-                    avatar: `https://ui-avatars.com/api/?name=Grand+Admin&background=9b6a38&color=fff`,
-                    provider: 'email',
-                    role: 'admin'
-                };
-            } else {
-                // Regular user
-                authUser = {
-                    id: 'email-user-' + Date.now(),
-                    email,
-                    name: email.split('@')[0],
-                    avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=9b6a38&color=fff`,
-                    provider: 'email',
-                    role: 'user'
-                };
-            }
+            setUser(user);
+            setToken(token);
 
-            setUser(authUser);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
-            return authUser;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            localStorage.setItem(TOKEN_KEY, token);
 
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            return user;
         } catch (error) {
-            throw new Error('Authentication failed');
+            console.error('Login failed', error.response?.data || error.message);
+            throw new Error(error.response?.data?.message || 'Authentication failed');
         }
-    };
-
-    const signupWithEmail = async (name, email, password, role = 'candidate') => {
-        // Mocking Signup
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (email && password && name) {
-                    const mockUser = {
-                        id: 'email-user-' + Date.now(),
-                        email,
-                        name,
-                        avatar: `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=9b6a38&color=fff`,
-                        provider: 'email',
-                        role
-                    };
-                    setUser(mockUser);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
-                    resolve(mockUser);
-                } else {
-                    reject(new Error('Please fill all fields'));
-                }
-            }, 500);
-        });
     };
 
     const logout = () => {
         setUser(null);
+        setToken(null);
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+        delete axios.defaults.headers.common['Authorization'];
+    };
+
+    const signupWithEmail = async (name, email, password, role) => {
+        try {
+            const response = await axios.post(`${API_URL}/auth/register`, {
+                name, email, password, role
+            });
+            const { token, user } = response.data;
+            setUser(user);
+            setToken(token);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            localStorage.setItem(TOKEN_KEY, token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            return user;
+        } catch (error) {
+            console.error('Signup failed', error.response?.data || error.message);
+            throw new Error(error.response?.data?.message || 'Registration failed');
+        }
+    };
+
+    const loginWithEmail = async (email, password) => {
+        try {
+            const response = await axios.post(`${API_URL}/auth/login`, {
+                email, password
+            });
+            const { token, user } = response.data;
+            setUser(user);
+            setToken(token);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            localStorage.setItem(TOKEN_KEY, token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            return user;
+        } catch (error) {
+            console.error('Login failed', error.response?.data || error.message);
+            throw new Error(error.response?.data?.message || 'Authentication failed');
+        }
     };
 
     const value = {
         user,
+        token,
         loading,
         loginWithGoogle,
-        loginWithEmail,
         signupWithEmail,
+        loginWithEmail,
         logout
     };
 

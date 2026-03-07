@@ -12,7 +12,8 @@ import Biodata from './pages/Biodata';
 import Events from './pages/Events';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
-
+import UserProfile from './pages/UserProfile'; // Added import
+import PublicProfile from './pages/PublicProfile'; // Added import
 // Admin Views
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
@@ -26,22 +27,28 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public & App Routes with Standard Layout */}
+          {/* Public Login Route */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+
+          {/* Protected App Routes with Standard Layout */}
           <Route element={
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <Navbar />
-              <main className="main-content">
-                <Outlet />
-              </main>
-              <Footer />
-            </div>
+            <ProtectedRoute>
+              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                <Navbar />
+                <main className="main-content">
+                  <Outlet />
+                </main>
+                <Footer />
+              </div>
+            </ProtectedRoute>
           }>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/register" element={<ProtectedRoute><Register /></ProtectedRoute>} />
-            <Route path="/biodata" element={<ProtectedRoute><Biodata /></ProtectedRoute>} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/biodata" element={<Biodata />} />
+            <Route path="/profile" element={<UserProfile />} /> {/* Added /profile route */}
+            <Route path="/candidate/:id" element={<PublicProfile />} /> {/* Added public profile view */}
             <Route path="*" element={<Home />} />
           </Route>
 

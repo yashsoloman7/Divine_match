@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INTEREST_OPTIONS } from '../data/mockData';
-import { addCandidate } from '../services/candidateService';
+import { addCandidate, getCandidateByUserId, updateCandidate } from '../services/candidateService';
+import { useAuth } from '../context/AuthContext';
 import { Check, UploadCloud } from 'lucide-react';
 
 const Register = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const [existingProfileId, setExistingProfileId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [formData, setFormData] = useState({
         email: '',
         firstName: '',
@@ -47,6 +51,43 @@ const Register = () => {
         marksheets: null,
         pastorLetter: null
     });
+
+    useEffect(() => {
+        const fetchExistingProfile = async () => {
+            if (user && user.id) {
+                try {
+                    const profile = await getCandidateByUserId(user.id);
+                    if (profile) {
+                        setExistingProfileId(profile.id);
+
+                        // Strip out MongoDB-specific fields we don't need in state
+                        const { _id, id, __v, createdAt, updatedAt, ...profileData } = profile;
+
+                        // Parse DOB for datetime-local or date input if needed
+                        let formattedDob = '';
+                        if (profileData.dob) {
+                            formattedDob = new Date(profileData.dob).toISOString().split('T')[0];
+                        }
+
+                        setFormData({
+                            ...formData,
+                            ...profileData,
+                            dob: formattedDob,
+                            interests: profileData.interests || []
+                        });
+
+                        // Inform user
+                        console.log("Existing profile found and loaded");
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch existing profile:", error);
+                }
+            }
+            setIsLoading(false);
+        };
+
+        fetchExistingProfile();
+    }, [user]);
 
     const handleInterestToggle = (interest) => {
         setFormData(prev => {
@@ -127,24 +168,40 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const avatarUrl = formData.avatarData || (formData.gender === 'Male'
-            ? `https://xsgames.co/randomusers/assets/avatars/male/${Math.floor(Math.random() * 50)}.jpg`
-            : `https://xsgames.co/randomusers/assets/avatars/female/${Math.floor(Math.random() * 50)}.jpg`);
+        // Use existing avatar if not updated, or generate dummy
+        let avatarUrl = formData.avatarData;
+        if (!avatarUrl && existingProfileId) {
+            avatarUrl = formData.avatar;
+        } else if (!avatarUrl) {
+            avatarUrl = formData.gender === 'Male'
+                ? `https://xsgames.co/randomusers/assets/avatars/male/${Math.floor(Math.random() * 50)}.jpg`
+                : `https://xsgames.co/randomusers/assets/avatars/female/${Math.floor(Math.random() * 50)}.jpg`;
+        }
 
         const submissionData = {
             ...formData,
             fullName: `${formData.firstName} ${formData.lastName}`.trim(),
-            avatar: avatarUrl
+            avatar: avatarUrl,
+            userId: user.id
         };
 
         try {
-            const newCandidate = await addCandidate(submissionData);
-            navigate('/biodata', { state: { profile: newCandidate } });
+            let savedCandidate;
+            if (existingProfileId) {
+                savedCandidate = await updateCandidate(existingProfileId, submissionData);
+            } else {
+                savedCandidate = await addCandidate(submissionData);
+            }
+            navigate(`/candidate/${savedCandidate.id || savedCandidate._id}`);
         } catch (error) {
-            console.error("Failed to register candidate:", error);
+            console.error("Failed to register/update candidate:", error);
             alert("Error saving candidate! Ensure the backend connection is successful.");
         }
     };
+
+    if (isLoading) {
+        return <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>Loading profile data...</div>;
+    }
 
     const SectionHeader = ({ title }) => (
         <h3 style={{
@@ -162,9 +219,13 @@ const Register = () => {
     return (
         <div className="container" style={{ maxWidth: '1000px', padding: '2rem 1rem' }}>
             <div className="glass-card animate-fade-in" style={{ padding: '3rem' }}>
-                <h2 className="heading-2" style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>Candidate Registration Form</h2>
+                <h2 className="heading-2" style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>
+                    {existingProfileId ? 'Update Your Profile' : 'Candidate Registration Form'}
+                </h2>
                 <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-                    Please fill out all the details accurately to generate your Matrimony Biodata.
+                    {existingProfileId
+                        ? 'Update your details below. Changes will be reflected in your Matrimony Biodata.'
+                        : 'Please fill out all the details accurately to generate your Matrimony Biodata.'}
                 </p>
 
                 <form onSubmit={handleSubmit}>
@@ -465,7 +526,7 @@ const Register = () => {
 
                     <div style={{ marginTop: '3rem', textAlign: 'center' }}>
                         <button type="submit" className="btn btn-primary" style={{ minWidth: '300px', fontSize: '1.2rem', padding: '1rem 2rem' }}>
-                            Submit Registration & Generate Biodata
+                            {existingProfileId ? 'Update Registration & Biodata' : 'Submit Registration & Generate Biodata'}
                         </button>
                     </div>
                 </form>

@@ -7,10 +7,11 @@ const connectDB = require('./config/db');
 const adminRoutes = require('./routes/adminRoutes');
 const candidateRoutes = require('./routes/candidateRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to MongoDB (must be after dotenv.config so MONGO_URI is available)
 connectDB();
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/admins', adminRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/events', eventRoutes);

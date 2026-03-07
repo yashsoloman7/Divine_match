@@ -46,7 +46,8 @@ export const addCandidate = async (candidate) => {
             partnerPreferences: candidate.partnerPreferences || '',
             interests: candidate.interests || [],
             avatar: candidate.avatar || 'https://xsgames.co/randomusers/avatar.php?g=pixel',
-            bio: candidate.bio || ''
+            bio: candidate.bio || '',
+            userId: candidate.userId || null
         };
 
         const response = await fetch(API_URL, {
@@ -78,6 +79,47 @@ export const getCandidateById = async (id) => {
         return await response.json();
     } catch (error) {
         console.error(`Unexpected error fetching candidate ${id}:`, error);
+        return null;
+    }
+};
+
+export const updateCandidate = async (id, candidate) => {
+    try {
+        const dbPayload = {
+            ...candidate,
+            fullName: candidate.fullName || `${candidate.firstName || ''} ${candidate.lastName || ''}`.trim(),
+            age: candidate.age ? parseInt(candidate.age, 10) : null,
+        };
+
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dbPayload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Unexpected error updating candidate:', error);
+        throw error;
+    }
+};
+
+export const getCandidateByUserId = async (userId) => {
+    try {
+        const response = await fetch(`${API_URL}/user/${userId}`);
+        if (!response.ok) {
+            if (response.status === 404) return null;
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Unexpected error fetching candidate for user ${userId}:`, error);
         return null;
     }
 };

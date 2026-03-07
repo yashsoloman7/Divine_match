@@ -94,14 +94,14 @@ const SignUp = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label className="form-label">I am registering as</label>
-                        <select 
+                        <select
                             className="form-control"
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
                             required
                         >
                             <option value="candidate">Candidate (For Myself)</option>
-                            <option value="guardian">Guardian / Host (For Relative)</option>
+                            <option value="host">Guardian / Host (For Relative)</option>
                         </select>
                     </div>
                     <div className="form-group">
